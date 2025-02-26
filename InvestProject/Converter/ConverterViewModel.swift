@@ -19,9 +19,9 @@ class ConverterViewModel {
 
 
     func fetchCurrencyList() {
-        convertManager.getConverter(endpoint: .currencyEndpoint) { [weak self] (data: Currency?, err) in
-            if let err = err {
-                self?.error?(err)
+        convertManager.getConverter(endpoint: .currencyEndpoint) { [weak self] (data: Currency?, error) in
+            if let error = error {
+                self?.error?(error)
                 return
             }
             if let data = data {
@@ -32,19 +32,22 @@ class ConverterViewModel {
     }
 
 
-    func fetchConversion(currency: String, date: String) {
-        let endpointString = ConverterEndpoint.converterEndpoint.rawValue
+    func fetchConversion(currency: String, date: String, completion: @escaping (Double?) -> Void) {
+        let endpoint = ConverterEndpoint.converterEndpoint.rawValue
             .replacingOccurrences(of: "{CURRENCY}", with: currency)
             .replacingOccurrences(of: "{DATE}", with: date)
-        NetworkManager.request(model: Convertor.self, endpoint: endpointString) { [weak self] data, err in
-            if let err = err {
-                self?.error?(err)
+        NetworkManager.request(model: Convertor.self, endpoint: endpoint) { [weak self] data, error in
+            if let error = error {
+                completion(nil)
                 return
             }
-            if let data = data {
-                self?.convertStruct = data
-                self?.success?()
+            if let data = data, let result = data.first?.result {
+                completion(result)
+            } else {
+                completion(nil)
             }
         }
     }
+
+
 }
