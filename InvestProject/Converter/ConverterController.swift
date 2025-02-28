@@ -211,9 +211,11 @@ class ConverterController: ConfigureExtension, UITabBarDelegate {
     
     func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         if item.tag == 0 {
-            print("Currency Converter selected")
+            let converterVC = ConverterController()
+            navigationController?.pushViewController(converterVC, animated: true)
         } else if item.tag == 1 {
-            print("Online Quotes selected")
+            let quotesVC = QuotesViewController()
+            navigationController?.pushViewController(quotesVC, animated: true)
         }
     }
 }

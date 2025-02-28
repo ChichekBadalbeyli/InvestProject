@@ -15,7 +15,6 @@ class ConfigureExtension: UIViewController {
         configureUI()
         configureConstraints()
         configureTableView()
-        
     }
     
     func configureUI() {}
