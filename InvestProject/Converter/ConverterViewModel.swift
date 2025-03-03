@@ -8,16 +8,16 @@
 import Foundation
 
 class ConverterViewModel {
-
+    
     var convertStruct = Convertor()
     var currencyStruct = Currency()
-
+    
     var success: (() -> Void)?
     var error: ((String) -> Void)?
-
+    
     private let convertManager = ConverterManager()
-
-
+    
+    
     func fetchCurrencyList() {
         convertManager.getConverter(endpoint: .currencyEndpoint) { [weak self] (data: Currency?, error) in
             if let error = error {
@@ -30,8 +30,8 @@ class ConverterViewModel {
             }
         }
     }
-
-
+    
+    
     func fetchConversion(currency: String, date: String, completion: @escaping (Double?) -> Void) {
         let endpoint = ConverterEndpoint.converterEndpoint.rawValue
             .replacingOccurrences(of: "{CURRENCY}", with: currency)
@@ -48,6 +48,4 @@ class ConverterViewModel {
             }
         }
     }
-
-
 }

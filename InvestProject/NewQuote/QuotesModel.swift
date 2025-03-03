@@ -4,23 +4,30 @@
 //
 //  Created by Chichek on 28.02.25.
 //
-
 import Foundation
 import Combine
 
-import Foundation
-
-class QuotesViewModel {
+class QuotesViewModel: WebSocketManagerDelegate {
     private var webSocketManager: WebSocketManager?
     private(set) var quotes: [[String: String]] = []
     private(set) var isConnected: Bool = false
     private(set) var hiddenQuotes: Set<String> = []
+    
+    private var quotesSubject = PassthroughSubject<[[String: String]], Never>()
+    private var cancellables = Set<AnyCancellable>()
     
     var onDataUpdate: (() -> Void)?
     
     init() {
         webSocketManager = WebSocketManager()
         webSocketManager?.delegate = self
+        quotesSubject
+            .throttle(for: .seconds(3), scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] newQuotes in
+                self?.quotes = newQuotes
+                self?.onDataUpdate?()
+            }
+            .store(in: &cancellables)
     }
     
     func toggleQuoteVisibility(symbol: String) {
@@ -33,22 +40,21 @@ class QuotesViewModel {
     }
     
     func filteredQuotes() -> [[String: String]] {
-        return quotes.filter { quote in
-            guard let symbol = quote["1"] else { return false }
-            return !hiddenQuotes.contains(symbol)
-        }
+        return quotes
     }
     
-}
-
-extension QuotesViewModel: WebSocketManagerDelegate {
     func didReceiveQuotes(_ quotes: [[String: String]]) {
-        self.quotes = quotes
-        onDataUpdate?()
+        guard !quotes.isEmpty else { return }
+        quotesSubject.send(quotes)
     }
     
     func didUpdateConnectionStatus(isConnected: Bool) {
         self.isConnected = isConnected
+        onDataUpdate?()
+    }
+    
+    func resetHiddenQuotes() {
+        hiddenQuotes.removeAll()
         onDataUpdate?()
     }
 }

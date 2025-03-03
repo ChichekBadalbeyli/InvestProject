@@ -9,7 +9,8 @@ import Foundation
 import UIKit
 
 class QuoteCell: UITableViewCell {
-   static let reuseIdentifier = "QuoteCell"
+    var symbol: String?
+    static let reuseIdentifier = "QuoteCell"
     
     private let symbolLabel: UILabel = {
         let label = UILabel()
@@ -67,12 +68,11 @@ class QuoteCell: UITableViewCell {
         symbolLabel.text = quote["1"] ?? "N/A"
         priceLabel.text = quote["5"] ?? "N/A"
         changeLabel.text = quote["0"] == "up" ? "▲" : "▼"
-        if quote["0"] == "up" {
-            changeLabel.textColor = .green
-        } else {
-            changeLabel.textColor = .red
-        }
-        contentView.alpha = isHidden ? 0.5 : 1.0
+        changeLabel.textColor = (quote["0"] == "up") ? .green : .red
+        contentView.alpha = isHidden ? 0.3 : 1.0
+        contentView.alpha = isHidden ? 0.3 : 1.0
     }
     
+    
 }
+

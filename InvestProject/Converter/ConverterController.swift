@@ -11,17 +11,6 @@ class ConverterController: ConfigureExtension, UITabBarDelegate {
     
     private let viewModel = ConverterViewModel()
     
-    private var tabBarView: UITabBar = {
-        let tabBar = UITabBar()
-        tabBar.items = [
-            UITabBarItem(title: "Currency Converter", image: UIImage(systemName: "arrow.2.squarepath"), tag: 0),
-            UITabBarItem(title: "Online Quotes", image: UIImage(systemName: "chart.bar"), tag: 1)
-        ]
-        tabBar.barTintColor = .black
-        tabBar.tintColor = .white
-        tabBar.unselectedItemTintColor = .gray
-        return tabBar
-    }()
     
     private let primaryCurrencyButton: UIButton = {
         let button = UIButton(type: .system)
@@ -58,35 +47,20 @@ class ConverterController: ConfigureExtension, UITabBarDelegate {
         label.textAlignment = .center
         return label
     }()
-    private let convertButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Convert", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 18, weight: .medium)
-        button.tintColor = .white
-        button.backgroundColor = .systemBlue
-        button.layer.cornerRadius = 8
-        return button
-    }()
     
     private let currencyPicker = UIPickerView()
     private var isSelectingPrimary = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .blue
-        tabBarView.delegate = self
         configureBindings()
-        
         primaryCurrencyButton.addTarget(self, action: #selector(selectPrimaryCurrency), for: .touchUpInside)
         secondaryCurrencyButton.addTarget(self, action: #selector(selectSecondaryCurrency), for: .touchUpInside)
         amountTextField.addTarget(self, action: #selector(convertCurrency), for: .editingChanged)
-        
         viewModel.fetchCurrencyList()
     }
     
     override func configureUI() {
-        view.addSubview(tabBarView)
-        tabBarView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(primaryCurrencyButton)
         primaryCurrencyButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(amountTextField)
@@ -95,19 +69,10 @@ class ConverterController: ConfigureExtension, UITabBarDelegate {
         secondaryCurrencyButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(resultLabel)
         resultLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(convertButton)
-        convertButton.translatesAutoresizingMaskIntoConstraints = false
     }
     
     override func configureConstraints() {
-        tabBarView.anchor(
-            top: nil,
-            bottom: view.safeAreaLayoutGuide.bottomAnchor,
-            leading: view.leadingAnchor,
-            trailing: view.trailingAnchor,
-            constraint: (top: 0, bottom: 0, leading: 0, trailing: 0),
-            height: 60
-        )
+        
         primaryCurrencyButton.anchor(
             top: view.safeAreaLayoutGuide.topAnchor,
             bottom: amountTextField.topAnchor,
@@ -126,23 +91,14 @@ class ConverterController: ConfigureExtension, UITabBarDelegate {
         
         secondaryCurrencyButton.anchor(
             top: amountTextField.bottomAnchor,
-            bottom: convertButton.topAnchor,
+            bottom: resultLabel.topAnchor,
             leading: view.leadingAnchor,
             trailing: view.trailingAnchor,
             constraint: (top: 20, bottom: 10, leading: 20, trailing: 20)
         )
         
-        convertButton.anchor(
-            top: secondaryCurrencyButton.bottomAnchor,
-            bottom: resultLabel.topAnchor,
-            leading: view.leadingAnchor,
-            trailing: view.trailingAnchor,
-            constraint: (top: 20, bottom: 10, leading: 20, trailing: 20),
-            height: 50
-        )
-        
         resultLabel.anchor(
-            top: convertButton.bottomAnchor,
+            top: secondaryCurrencyButton.bottomAnchor,
             bottom: nil,
             leading: view.leadingAnchor,
             trailing: view.trailingAnchor,
@@ -208,16 +164,6 @@ class ConverterController: ConfigureExtension, UITabBarDelegate {
         }
     }
     
-    
-    func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
-        if item.tag == 0 {
-            let converterVC = ConverterController()
-            navigationController?.pushViewController(converterVC, animated: true)
-        } else if item.tag == 1 {
-            let quotesVC = QuotesViewController()
-            navigationController?.pushViewController(quotesVC, animated: true)
-        }
-    }
 }
 
 extension ConverterController: UIPickerViewDelegate, UIPickerViewDataSource {
